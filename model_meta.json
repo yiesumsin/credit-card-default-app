@@ -1,0 +1,62 @@
+{
+  "model_name": "Gradient Boosted Trees (trained in KNIME, exported as PMML)",
+  "trained_on_rows": 30000,
+  "default_rate": 0.221,
+  "threshold": 0.25,
+  "settings": {
+    "trees": 100,
+    "tree_depth": 3,
+    "learning_rate": 0.03,
+    "smote": false
+  },
+  "replica_roc_auc": 0.7819,
+  "runs": {
+    "no_smote_cv": {
+      "label": "5-fold cross-validation, no SMOTE (final model)",
+      "auc": 0.778770828,
+      "at_0.25": {
+        "tp": 4155,
+        "fp": 4660,
+        "tn": 18704,
+        "fn": 2481
+      },
+      "at_0.50": {
+        "tp": 2180,
+        "fp": 929,
+        "tn": 22435,
+        "fn": 4456
+      }
+    },
+    "smote_cv": {
+      "label": "5-fold cross-validation, with SMOTE",
+      "auc": 0.773245672,
+      "at_0.25": {
+        "tp": 5018,
+        "fp": 8662,
+        "tn": 14702,
+        "fn": 1618
+      },
+      "at_0.50": {
+        "tp": 3312,
+        "fp": 2651,
+        "tn": 20713,
+        "fn": 3324
+      }
+    },
+    "single_split": {
+      "label": "Single 70/30 split, no SMOTE, no cross-validation",
+      "auc": 0.771360156,
+      "at_0.25": {
+        "tp": 1231,
+        "fp": 1420,
+        "tn": 5589,
+        "fn": 760
+      },
+      "at_0.50": {
+        "recall": 0.321948769,
+        "precision": 0.704395604,
+        "f1": 0.44191658
+      }
+    }
+  }
+}
