@@ -216,9 +216,9 @@ with tab_batch:
             except Exception as error:
                 st.error(f"That file could not be read as a CSV: {error}")
     elif "without" in source:
-        data = pd.read_csv(HERE / "sample_data" / "synthetic_clients_1000_no_labels.csv")
+        data = pd.read_csv(HERE / "synthetic_clients_1000_no_labels.csv")
     else:
-        data = pd.read_csv(HERE / "sample_data" / "synthetic_clients_1000.csv")
+        data = pd.read_csv(HERE / "synthetic_clients_1000.csv")
 
     if data is not None:
         data = standardise_columns(data)
