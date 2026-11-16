@@ -8,19 +8,19 @@ import plotly.graph_objects as go
 import streamlit as st
 
 # ---------------------------------------------------------------------------------------------------------
-# 1. Colour palette: purple, blue and white, plus red / green that are used ONLY for risk messages.
+# 1. Colour palette: forest green, slate and white, plus red / green that are used ONLY for risk messages.
 # ---------------------------------------------------------------------------------------------------------
-PURPLE = "#6D3FD9"        # main brand colour
-DEEP_PURPLE = "#4B2FB5"
-BLUE = "#3B82F6"
-LIGHT_PURPLE = "#F4F1FF"  # soft background for cards and the sidebar
-LIGHT_BLUE = "#EAF2FF"
-BORDER = "#E2DBFA"
-INK = "#1E1B4B"           # dark text
-MUTED = "#6B7280"
-RED, RED_BG = "#DC2626", "#FEF2F2"
-GREEN, GREEN_BG = "#16A34A", "#F0FDF4"
-GRID = "#EEE9FF"
+PURPLE = "#315D54"        # main brand colour
+DEEP_PURPLE = "#243B35"
+BLUE = "#617C90"
+LIGHT_PURPLE = "#F5F6F4"  # soft background for cards and the sidebar
+LIGHT_BLUE = "#EDF1F3"
+BORDER = "#DDE2DD"
+INK = "#242C29"           # dark text
+MUTED = "#67716B"
+RED, RED_BG = "#A34436", "#FAF3F0"
+GREEN, GREEN_BG = "#315D54", "#EFF5F1"
+GRID = "#E8ECE8"
 
 FONT = "Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
 
@@ -32,65 +32,39 @@ FONT = "Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
 def inject_css():
     css = f"""
     <style>
-      html, body, [class*="css"] {{ font-family: {FONT}; color: {INK}; }}
-      .block-container {{ padding-top: 3.6rem; padding-bottom: 3rem; max-width: 1250px; }}
-
-      /* Banner at the top of the page */
-      .hero {{ background: linear-gradient(120deg, {DEEP_PURPLE} 0%, {PURPLE} 45%, {BLUE} 100%);
-               border-radius: 18px; padding: 26px 32px; color: white; margin-bottom: 18px;
-               box-shadow: 0 10px 28px rgba(75, 47, 181, 0.25); }}
-      .hero h1 {{ color: white; font-size: 2.0rem; margin: 0 0 4px 0; padding: 0; font-weight: 700; }}
-      .hero p {{ color: #E9E4FF; margin: 0; font-size: 1.02rem; }}
-      .hero .chip {{ display: inline-block; background: rgba(255,255,255,0.18); border-radius: 999px;
-                     padding: 3px 12px; margin: 10px 8px 0 0; font-size: 0.82rem; }}
-
-      /* Sidebar */
-      [data-testid="stSidebar"] {{ background: linear-gradient(180deg, {LIGHT_PURPLE} 0%, {LIGHT_BLUE} 100%);
-                                   border-right: 1px solid {BORDER}; }}
-      [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{ color: {DEEP_PURPLE}; }}
-      [data-testid="stSidebar"] [data-testid="stExpander"] {{ background: white; border: 1px solid {BORDER};
-                                                              border-radius: 12px; }}
-
-      /* Buttons */
-      .stButton > button, .stDownloadButton > button {{
-          background: linear-gradient(120deg, {PURPLE}, {BLUE}); color: white; border: 0; border-radius: 10px;
-          padding: 0.5rem 1.1rem; font-weight: 600; transition: transform .08s ease, box-shadow .15s ease; }}
-      .stButton > button:hover, .stDownloadButton > button:hover {{
-          color: white; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(109, 63, 217, 0.35); }}
-      .stButton > button:focus, .stDownloadButton > button:focus {{ color: white; }}
-
-      /* Tabs */
-      .stTabs [data-baseweb="tab-list"] {{ gap: 6px; }}
-      .stTabs [data-baseweb="tab"] {{ border-radius: 10px 10px 0 0; padding: 8px 18px; font-weight: 600; }}
-      .stTabs [aria-selected="true"] {{ color: {PURPLE}; }}
-      .stTabs [data-baseweb="tab-highlight"] {{ background-color: {PURPLE}; }}
-
-      /* Metric cards */
-      .card {{ background: white; border: 1px solid {BORDER}; border-top: 4px solid {PURPLE}; border-radius: 14px;
-               padding: 14px 18px; box-shadow: 0 4px 14px rgba(75, 47, 181, 0.07); height: 100%; }}
-      .card.blue {{ border-top-color: {BLUE}; }}
-      .card .label {{ color: {MUTED}; font-size: 0.80rem; text-transform: uppercase; letter-spacing: .06em; }}
-      .card .value {{ color: {INK}; font-size: 1.85rem; font-weight: 700; line-height: 1.25; }}
-      .card .sub {{ color: {MUTED}; font-size: 0.82rem; }}
-
-      /* Risk result boxes: red for high risk, green for low risk */
-      .risk-card {{ border-radius: 16px; padding: 20px 24px; border: 2px solid; }}
-      .risk-card .risk-label {{ font-size: 1.6rem; font-weight: 800; }}
-      .risk-card .risk-text {{ font-size: 1.0rem; margin-top: 4px; }}
-      .risk-high {{ background: {RED_BG}; border-color: {RED}; color: #7F1D1D; }}
-      .risk-low {{ background: {GREEN_BG}; border-color: {GREEN}; color: #14532D; }}
-
-      /* Small helper text */
-      .note {{ background: {LIGHT_PURPLE}; border-left: 4px solid {PURPLE}; border-radius: 8px;
-               padding: 10px 14px; color: {INK}; font-size: 0.92rem; }}
-      h2, h3, h4 {{ color: {DEEP_PURPLE}; }}
+      .block-container {{ padding-top: 3rem; padding-bottom: 3rem; max-width: 1160px; }}
+      .hero {{ padding: 0 0 22px; border-bottom: 1px solid {BORDER}; margin-bottom: 18px; }}
+      .hero h1 {{ color: {INK}; font-size: 2rem; margin: 0; padding: 0; font-weight: 600; letter-spacing: -.03em; }}
+      .hero p {{ color: {MUTED}; margin: 8px 0 0; font-size: 1rem; }}
+      .hero .chip {{ display: inline-block; color: {MUTED}; margin: 12px 20px 0 0; font-size: .8rem; }}
+      .stTabs [data-baseweb="tab-list"] {{ gap: 20px; }}
+      .stTabs [data-baseweb="tab"] {{ padding: 10px 0; font-weight: 500; }}
+      [data-testid="stForm"] {{ border: 1px solid {BORDER}; border-radius: 6px; padding: 24px; }}
+      .card {{ background: white; border: 1px solid {BORDER}; border-radius: 6px;
+               padding: 16px 18px; height: 100%; }}
+      .card .label {{ color: {MUTED}; font-size: .85rem; }}
+      .card .value {{ color: {INK}; font-size: 1.85rem; font-weight: 600; line-height: 1.4; }}
+      .card .sub {{ color: {MUTED}; font-size: .82rem; }}
+      .risk-card {{ border-radius: 4px; padding: 18px 22px; border-left: 4px solid; margin-bottom: 20px; }}
+      .risk-card .risk-label {{ font-size: 1.3rem; font-weight: 600; }}
+      .risk-card .risk-text {{ font-size: .95rem; margin-top: 6px; }}
+      .risk-high {{ background: {RED_BG}; border-color: {RED}; color: {INK}; }}
+      .risk-low {{ background: {GREEN_BG}; border-color: {GREEN}; color: {INK}; }}
+      .note {{ background: {LIGHT_PURPLE}; border-left: 3px solid {BORDER};
+               padding: 12px 16px; color: {INK}; font-size: .92rem; }}
+      h2, h3, h4 {{ color: {INK}; }}
+      @media (max-width: 640px) {{
+        .block-container {{ padding-left: 1rem; padding-right: 1rem; }}
+        [data-testid="stForm"] {{ padding: 12px; }}
+        .hero h1 {{ font-size: 1.65rem; }}
+      }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
 
 
 def hero(title: str, subtitle: str, chips: list):
-    """The gradient banner at the top of the page."""
+    """The understated page title and supporting context."""
     chip_html = "".join(f'<span class="chip">{c}</span>' for c in chips)
     st.markdown(f'<div class="hero"><h1>{title}</h1><p>{subtitle}</p>{chip_html}</div>', unsafe_allow_html=True)
 
@@ -104,10 +78,10 @@ def card(label: str, value: str, sub: str = "", blue: bool = False) -> str:
 def risk_card(is_high: bool, probability: float, threshold: float) -> str:
     """The big red (high risk) or green (low risk) result box."""
     if is_high:
-        return (f'<div class="risk-card risk-high"><div class="risk-label">⚠️ Defaulter: high risk</div>'
+        return (f'<div class="risk-card risk-high"><div class="risk-label">Above the decision cutoff</div>'
                 f'<div class="risk-text">Predicted probability of default is <b>{probability:.1%}</b>, '
-                f'at or above the {threshold:.0%} cutoff. Review this client before extending credit.</div></div>')
-    return (f'<div class="risk-card risk-low"><div class="risk-label">✅ Non-defaulter: low risk</div>'
+                f'at or above the {threshold:.0%} cutoff. This is a model estimate, not a confirmed outcome.</div></div>')
+    return (f'<div class="risk-card risk-low"><div class="risk-label">Below the decision cutoff</div>'
             f'<div class="risk-text">Predicted probability of default is <b>{probability:.1%}</b>, '
             f'below the {threshold:.0%} cutoff.</div></div>')
 
@@ -116,12 +90,12 @@ def risk_card(is_high: bool, probability: float, threshold: float) -> str:
 # 3. Plotly charts, all styled with the same palette
 # ---------------------------------------------------------------------------------------------------------
 def _style(fig, height=360, title=None):
-    """Apply the shared chart style: white background, light purple grid, matching fonts."""
+    """Apply the shared chart style: white background, light neutral grid, matching fonts."""
     fig.update_layout(
         template="plotly_white", height=height, title=dict(text=title, font=dict(size=16, color=DEEP_PURPLE)) if title else None,
         font=dict(family=FONT, color=INK), paper_bgcolor="white", plot_bgcolor="white",
         margin=dict(l=40, r=60, t=55 if title else 20, b=40), legend=dict(orientation="h", y=-0.2),
-        colorway=[PURPLE, BLUE, "#A78BFA", "#93C5FD"])
+        colorway=[PURPLE, BLUE, "#91A59A", "#B2C2CA"])
     fig.update_xaxes(gridcolor=GRID, zerolinecolor=GRID)
     fig.update_yaxes(gridcolor=GRID, zerolinecolor=GRID)
     return fig
@@ -161,11 +135,11 @@ def confusion_matrix_fig(tp, fp, tn, fn, title="Confusion matrix"):
     mistakes are pale. Each cell shows the count and its share of all clients."""
     total = max(tp + fp + tn + fn, 1)
     cells = [  # (row, column, name, count, fill colour, text colour)
-        (0, 0, "True negative", tn, BLUE, "white"), (0, 1, "False positive", fp, "#DBEAFE", INK),
-        (1, 0, "False negative", fn, "#EDE9FE", INK), (1, 1, "True positive", tp, PURPLE, "white")]
+        (0, 0, "True negative", tn, BLUE, "white"), (0, 1, "False positive", fp, "#E7EDF0", INK),
+        (1, 0, "False negative", fn, "#EEF1EC", INK), (1, 1, "True positive", tp, PURPLE, "white")]
     fig = go.Figure(go.Heatmap(z=[[3, 1], [0, 2]], x=["Predicted non-default", "Predicted default"],
                                y=["Actual non-default", "Actual default"], showscale=False, xgap=5, ygap=5, hoverinfo="skip",
-                               colorscale=[[0, "#EDE9FE"], [0.3333, "#DBEAFE"], [0.6667, PURPLE], [1, BLUE]], zmin=0, zmax=3))
+                               colorscale=[[0, "#EEF1EC"], [0.3333, "#E7EDF0"], [0.6667, PURPLE], [1, BLUE]], zmin=0, zmax=3))
     for row, col, name, count, _, text_color in cells:
         fig.add_annotation(x=col, y=row, showarrow=False, font=dict(color=text_color, size=15),
                            text=f"<b>{name}</b><br>{count:,}<br>{count / total:.1%}")
@@ -178,10 +152,10 @@ def roc_fig(curves, title="ROC curve"):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Random guess (AUC 0.50)",
                              line=dict(color="#9CA3AF", dash="dash")))
-    palette = [PURPLE, BLUE, "#A78BFA"]
+    palette = [PURPLE, BLUE, "#91A59A"]
     for i, (name, fpr, tpr, auc) in enumerate(curves):
         fig.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name=f"{name} (AUC {auc:.3f})", fill="tozeroy" if i == 0 else None,
-                                 fillcolor="rgba(109, 63, 217, 0.10)", line=dict(color=palette[i % 3], width=3)))
+                                 fillcolor="rgba(49, 93, 84, 0.08)", line=dict(color=palette[i % 3], width=3)))
     fig.update_xaxes(title="False positive rate", range=[0, 1])
     fig.update_yaxes(title="True positive rate (recall)", range=[0, 1.02])
     return _style(fig, 380, title)
@@ -202,3 +176,4 @@ def risk_donut(n_high, n_low):
     fig = go.Figure(go.Pie(labels=["High risk (defaulter)", "Low risk (non-defaulter)"], values=[n_high, n_low], hole=0.62,
                            marker=dict(colors=[RED, BLUE]), textinfo="percent", sort=False))
     return _style(fig, 340, "Predicted outcome")
+

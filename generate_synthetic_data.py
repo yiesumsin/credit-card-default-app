@@ -95,6 +95,8 @@ for i, name in enumerate(BILLS):
     data[name] = bills[:, i].astype(int)
 for i, name in enumerate(PAYMENTS):
     data[name] = payments[:, i].astype(int)
+# Synthetic marital statuses, independent of repayment stress; no causal assumption.
+data["MARRIAGE"] = rng.choice([1, 2, 3], N_ROWS)
 data = data[["ID"] + RAW_COLUMNS]
 
 # ---- 7. The label: drawn from the model's own probability (see the note at the top of this file) ----------

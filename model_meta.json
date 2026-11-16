@@ -2,7 +2,7 @@
   "model_name": "Gradient Boosted Trees (trained in KNIME, exported as PMML)",
   "trained_on_rows": 30000,
   "default_rate": 0.221,
-  "threshold": 0.25,
+  "threshold": 0.3,
   "settings": {
     "trees": 100,
     "tree_depth": 3,
@@ -11,8 +11,30 @@
   },
   "replica_roc_auc": 0.7819,
   "runs": {
-    "no_smote_cv": {
+    "marriage_cv": {
       "label": "5-fold cross-validation, no SMOTE (final model)",
+      "auc": 0.779996549,
+      "at_0.25": {
+        "tp": 4145,
+        "fp": 4689,
+        "tn": 18675,
+        "fn": 2491
+      },
+      "at_0.30": {
+        "tp": 3637,
+        "fp": 3189,
+        "tn": 20175,
+        "fn": 2999
+      },
+      "at_0.50": {
+        "tp": 2103,
+        "fp": 885,
+        "tn": 22479,
+        "fn": 4533
+      }
+    },
+    "no_smote_cv": {
+      "label": "5-fold cross-validation, no SMOTE, without marriage",
       "auc": 0.778770828,
       "at_0.25": {
         "tp": 4155,
@@ -25,6 +47,12 @@
         "fp": 929,
         "tn": 22435,
         "fn": 4456
+      },
+      "at_0.30": {
+        "tp": 3599,
+        "fp": 3104,
+        "tn": 20260,
+        "fn": 3037
       }
     },
     "smote_cv": {

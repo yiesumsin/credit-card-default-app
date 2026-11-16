@@ -1,9 +1,10 @@
 """Feature engineering for the credit card default app.
 
-The PMML file exported from KNIME contains ONLY the trained trees. It expects 13 model inputs:
+The PMML file exported from KNIME contains ONLY the trained trees. It expects 16 model inputs:
 
     LIMIT_BAL, AGE, PAY_0, avg_bill, total_paid, max_delay, utilisation, pay_ratio, n_late,
-    EDUCATION_1, EDUCATION_2, EDUCATION_3, EDUCATION_4
+    EDUCATION_1, EDUCATION_2, EDUCATION_3, EDUCATION_4,
+    MARRIAGE_married, MARRIAGE_single, MARRIAGE_others
 
 Everything except LIMIT_BAL, AGE and PAY_0 is calculated from the raw client columns. This file repeats the
 KNIME Math Formula / Column Aggregator / One to Many steps exactly, so the app prepares a client the same way
@@ -20,18 +21,20 @@ PAY_STATUS = ["PAY_0", "PAY_2", "PAY_3", "PAY_4", "PAY_5", "PAY_6"]
 BILLS = [f"BILL_AMT{i}" for i in range(1, 7)]       # bill statement amount, month 1 (latest) to 6
 PAYMENTS = [f"PAY_AMT{i}" for i in range(1, 7)]     # amount paid, month 1 (latest) to 6
 
-# The raw columns a client file must contain. (SEX and MARRIAGE are NOT needed: the model does not use them.)
-RAW_COLUMNS = ["LIMIT_BAL", "AGE", "EDUCATION"] + PAY_STATUS + BILLS + PAYMENTS
+# The raw columns a client file must contain. (SEX is not used. MARRIAGE must be 1, 2 or 3.)
+RAW_COLUMNS = ["LIMIT_BAL", "AGE", "EDUCATION", "MARRIAGE"] + PAY_STATUS + BILLS + PAYMENTS
 
-# The 13 columns the PMML model reads (the order does not matter to PMML, it matches by name).
+# The 16 columns the PMML model reads (the order does not matter to PMML, it matches by name).
 MODEL_COLUMNS = [
     "LIMIT_BAL", "AGE", "PAY_0", "avg_bill", "total_paid", "max_delay", "utilisation", "pay_ratio", "n_late",
     "EDUCATION_1", "EDUCATION_2", "EDUCATION_3", "EDUCATION_4",
+    "MARRIAGE_married", "MARRIAGE_single", "MARRIAGE_others",
 ]
 
 # Names of the optional label column in a test file (any of these is accepted).
 LABEL_COLUMNS = ["default", "default payment next month", "DEFAULT"]
 
+MARRIAGE_LABELS = {1: "Married", 2: "Single", 3: "Others"}
 EDUCATION_LABELS = {1: "Graduate school", 2: "University", 3: "High school", 4: "Others / unknown"}
 PAY_STATUS_LABELS = {
     -2: "-2  No consumption",
@@ -71,7 +74,7 @@ def find_label_column(df: pd.DataFrame):
 
 
 def add_features(raw: pd.DataFrame) -> pd.DataFrame:
-    """Raw client columns in, the 13 model inputs out (same formulas as the KNIME workflow)."""
+    """Raw client columns in, the 16 model inputs out (same formulas as the KNIME workflow)."""
     d = raw[RAW_COLUMNS].astype(float).copy()
     out = pd.DataFrame(index=d.index)
 
@@ -98,6 +101,12 @@ def add_features(raw: pd.DataFrame) -> pd.DataFrame:
     education = d["EDUCATION"].replace({0: 4, 5: 4, 6: 4})
     for code in (1, 2, 3, 4):
         out[f"EDUCATION_{code}"] = (education == code).astype(float)
+
+    # Do not silently assign undocumented codes to a marital-status category.
+    if not d["MARRIAGE"].isin(MARRIAGE_LABELS).all():
+        raise ValueError("MARRIAGE must be 1 (married), 2 (single), or 3 (others).")
+    for code, label in ((1, "married"), (2, "single"), (3, "others")):
+        out[f"MARRIAGE_{label}"] = (d["MARRIAGE"] == code).astype(float)
 
     return out[MODEL_COLUMNS]
 

@@ -2,7 +2,7 @@
 
 A web app that estimates the chance that a credit card client misses a payment next month. It uses the
 **Gradient Boosted Trees** model trained in **KNIME** (exported as a PMML file) and shows the result with cards,
-a gauge, and interactive Plotly charts. This README explains, step by step, how to put it online **for free** using
+a submitted assessment, and interactive Plotly charts. This README explains, step by step, how to put it online **for free** using
 GitHub and Streamlit Community Cloud. No earlier GitHub experience is needed.
 
 > **Proof of concept.** The model is trained on public data from Taiwan (2005), not on EPF data, and is not meant for real
@@ -12,15 +12,26 @@ GitHub and Streamlit Community Cloud. No earlier GitHub experience is needed.
 
 ## 1. What is in this folder
 
+To run locally on this computer, double-click `run_app.bat`. It uses the project's `.venv` environment,
+where Streamlit and PyPMML are installed. If an older app is running in a terminal, stop it with Ctrl+C first.
+Alternatively, from PowerShell in this folder, run:
+
+```powershell
+& '.venv/Scripts/python.exe' -m streamlit run app.py
+```
+
+If `No module named 'pypmml'` appears after using a different launch command, that command may be using another
+Python environment. Use the launcher above rather than a bare `streamlit run app.py` command.
+
 | File or folder | What it does |
 | --- | --- |
-| `app.py` | The app itself: page layout, sidebar inputs, the four tabs |
-| `credit_features.py` | Turns the raw client columns into the 13 model inputs, with the same formulas as KNIME |
+| `app.py` | The app itself: page layout, client form, the four tabs |
+| `credit_features.py` | Turns the raw client columns into the 16 model inputs, with the same formulas as KNIME |
 | `pmml_model.py` | Loads the PMML file and returns a probability of default |
-| `ui.py` | Colours (purple, blue, white), custom CSS and all the Plotly charts |
+| `ui.py` | Colours (forest green, slate, white), custom CSS and all the Plotly charts |
 | `metrics.py` | Confusion matrix, ROC curve and AUC calculations |
 | `credit_card_default_classifier.pmml` | **The trained model** exported from KNIME |
-| `model_meta.json` | Your KNIME cross-validation results and the cutoff (0.25) shown on the Model performance tab |
+| `model_meta.json` | Your KNIME cross-validation results and the cutoff (0.30) shown on the Model performance tab |
 | `reference_roc.csv` | Points used to draw the ROC curve |
 | `sample_data/synthetic_clients_1000.csv` | 1,000 made-up clients **with** outcomes (for testing and presenting) |
 | `sample_data/synthetic_clients_1000_no_labels.csv` | The same clients **without** the outcome column |
@@ -33,12 +44,14 @@ GitHub and Streamlit Community Cloud. No earlier GitHub experience is needed.
 
 ## 2. The app in one minute
 
-* **Sidebar:** enter a client's details with sliders and dropdowns (credit limit, age, education, six months of repayment
-  status, bills and payments). Three **Quick example** buttons fill the whole form. A **Decision cutoff** slider lets you
-  change when a client is flagged (the chosen cutoff is **0.25**).
-* **Predict one client:** a red box (high risk) or green box (low risk), the probability, a gauge, a "what if the latest
-  status were different?" chart, and the 13 values the model actually sees.
-* **Score a CSV file:** upload a file of clients (or use the sample file). You get the risk for every client, charts, and a
+* **Client assessment:** enter the profile, then six monthly rows containing repayment status, bill amount and amount paid.
+  Type exact amounts in NT$. Use **Try an example client** to fill the form, then select **Calculate risk**.
+  Results show the submitted client's probability, the dataset average and the current cutoff. Edits take effect only
+  when you submit again. Loading an example clears the previous assessment.
+* **Decision cutoff:** below the client form and above its result, change the decision cutoff for both individual and batch scoring (default **0.30**).
+* **Assessment result:** a restrained risk summary, a "what if" repayment-status chart, and the 16 model inputs.
+  The submitted client values are also available for review.
+* **Score a CSV file:** upload a file of clients. You get the risk for every client, charts, and a
   download button. If the file has a `default` column (1 = defaulted, 0 = did not), you also get the confusion matrix and
   the ROC curve.
 * **Model performance:** the KNIME cross-validation results (ROC AUC, recall, precision, F1, confusion matrix, ROC curve).
@@ -47,9 +60,9 @@ GitHub and Streamlit Community Cloud. No earlier GitHub experience is needed.
 ### Format of a CSV you upload
 One row per client, with these columns (any order; extra columns such as `ID` are kept):
 
-`LIMIT_BAL, AGE, EDUCATION, PAY_0, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6, BILL_AMT1 ... BILL_AMT6, PAY_AMT1 ... PAY_AMT6`
+`LIMIT_BAL, AGE, EDUCATION, MARRIAGE, PAY_0, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6, BILL_AMT1 ... BILL_AMT6, PAY_AMT1 ... PAY_AMT6`
 
-Optional: `default` (0 or 1). A column called `PAY_1` is accepted in place of `PAY_0`. `SEX` and `MARRIAGE` are not needed.
+Optional: `default` (0 or 1). A column called `PAY_1` is accepted in place of `PAY_0`. `SEX` is not needed. `MARRIAGE` is required: 1 = married, 2 = single, 3 = others. Undocumented codes must be resolved before upload; they are not silently recoded.
 
 ---
 
@@ -85,7 +98,7 @@ your GitHub account). The screens change from time to time, so the button names 
    2. In the name box type exactly `.streamlit/config.toml` (typing the `/` creates the folder).
    3. Open `.streamlit/config.toml` from the unzipped folder in a text editor, copy everything and paste it into GitHub.
    4. Click **Commit changes**.
-   The app still works without this file, because `ui.py` also sets the colours, but the sliders will not be purple.
+   The app still works without this file, because `ui.py` also sets the colours, but the theme will use Streamlit defaults.
 7. Also check that `packages.txt` is in the repository. It contains one line, `default-jre-headless`, and it is what installs Java.
 
 ### Step 4: Deploy on Streamlit Community Cloud
@@ -129,14 +142,14 @@ minute. **Open it a few minutes before a presentation** so it is awake.
 
 ## 5. Suggested 5-minute walkthrough for your presentation
 
-1. **Predict tab.** Click **Low risk client** (about 12% probability, green), then **High risk client** (about 65%, red).
-   Click **Borderline client** (about 27%, just over the 25% cutoff) and drag the **Decision cutoff** slider to show how the
-   decision flips. Point out the "what if" chart: the latest repayment status is the strongest driver.
-2. **Score a CSV tab.** Choose "sample file with outcomes", show the risk distribution, the flagged clients, and download the
+1. **Predict tab.** Load the low-risk and high-risk examples in turn, selecting **Calculate risk** after each.
+   Load the **borderline example**, select **Calculate risk**, and change **Decision cutoff** below the client form to show how the
+   decision flips. Point out the "what if" chart: the chart varies only the latest repayment status.
+2. **Score a CSV tab.** Upload a synthetic demonstration CSV with outcomes, show the risk distribution, the flagged clients, and download the
    results. Scroll to the confusion matrix and ROC curve, and say that the outcomes in this file are synthetic.
-3. **Model performance tab.** This is the honest evidence: 5-fold cross-validated **ROC AUC 0.779**, **recall 62.6%** and
-   **precision 47.1%** at the 0.25 cutoff. Show how SMOTE and the single split compared.
-4. **About tab.** Explain the 13 inputs, the dropped columns and the limits.
+3. **Model performance tab.** This is the honest evidence: 5-fold cross-validated **ROC AUC 0.780**, **recall 54.8%** and
+   **precision 53.3%** at the 0.30 cutoff. Show how SMOTE and the single split compared.
+4. **About tab.** Explain the 16 inputs, the dropped columns and the limits.
 
 ---
 
@@ -171,7 +184,7 @@ EDUCATION   = codes 0, 5, 6 recoded to 4, then one-hot into EDUCATION_1 ... EDUC
 | `ModuleNotFoundError` in the log | A package is missing from `requirements.txt`. Add its name on a new line, commit, and the app rebuilds. |
 | "File does not exist: app.py" when deploying | The files were uploaded inside an extra folder. Move them to the top level of the repository, or set **Main file path** to `folder_name/app.py`. |
 | The app shows "Oh no" or a red error box | Open **Manage app** (bottom right) and read the log. The last lines say what failed. |
-| Sliders are not purple | `.streamlit/config.toml` is missing. See step 3.6. |
+| Theme colours look different | `.streamlit/config.toml` is missing. See step 3.6. |
 | "The file is missing these columns" after uploading | Check the column names against section 2. Names are case-sensitive. |
 | Rows were "left out" with a warning | Those rows had empty or non-numeric values, or a zero credit limit. Fix them in the CSV. |
 | The app is slow on first open | The free app was asleep. Wait a minute. |
@@ -182,11 +195,20 @@ EDUCATION   = codes 0, 5, 6 recoded to 4, then one-hot into EDUCATION_1 ... EDUC
 
 ## 8. Good to know
 
-* **Cutoff 0.25.** A client is flagged when the probability is at or above the cutoff. A lower cutoff catches more defaulters
+* **Cutoff 0.30.** A client is flagged when the probability is at or above the cutoff. A lower cutoff catches more defaulters
   and raises more false alarms.
 * **Probabilities.** The model was trained without SMOTE, so its probabilities are close to real default rates. The average
   client is about 22%.
 * **Privacy.** Uploaded CSV files are processed in the app session and are not saved by this app, but the hosted app is public.
   Do not upload confidential data to it.
-* **Dropped columns.** Sex and marital status are not used. The monthly bill, payment and status columns were replaced by the
+* **Dropped columns.** Sex is not used; marital status is one-hot encoded. The monthly bill, payment and status columns were replaced by the
   summary columns, except the latest repayment status (`PAY_0`), which carries information the summaries do not.
+
+
+### Current model update
+
+The PMML includes three one-hot marital-status inputs and was retrained on the full dataset.
+The default cutoff is 0.30. The final-model performance tab reports the supplied marriage-model
+cross-validation results (AUC 0.779996549; F1 about 0.540336 at 0.30), not training-set scores.
+The old reference ROC curve is not shown as a curve for this model. Synthetic examples are regenerated
+with marital status and outcomes sampled from the current model.
