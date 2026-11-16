@@ -1,10 +1,10 @@
-# Base theme for the app: purple, blue and white. (The extra styling lives in ui.py.)
+# Base theme for the app: forest green, slate and white. (The extra styling lives in ui.py.)
 [theme]
 base = "light"
-primaryColor = "#6D3FD9"            # sliders, selected tabs, focus rings
+primaryColor = "#315D54"            # sliders, selected tabs, focus rings
 backgroundColor = "#FFFFFF"         # main page
-secondaryBackgroundColor = "#F4F1FF" # sidebar, widget backgrounds
-textColor = "#1E1B4B"
+secondaryBackgroundColor = "#F5F6F4" # sidebar, widget backgrounds
+textColor = "#242C29"
 font = "sans serif"
 
 [server]
@@ -12,3 +12,4 @@ maxUploadSize = 50                  # megabytes; plenty for a CSV of tens of tho
 
 [browser]
 gatherUsageStats = false
+
