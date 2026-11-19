@@ -64,96 +64,8 @@ One row per client, with these columns (any order; extra columns such as `ID` ar
 
 Optional: `default` (0 or 1). A column called `PAY_1` is accepted in place of `PAY_0`. `SEX` is not needed. `MARRIAGE` is required: 1 = married, 2 = single, 3 = others. Undocumented codes must be resolved before upload; they are not silently recoded.
 
----
 
-## 3. Put the app online for free (GitHub + Streamlit Community Cloud)
-
-You need two free accounts: **GitHub** (stores your files) and **Streamlit Community Cloud** (runs the app, and signs in with
-your GitHub account). The screens change from time to time, so the button names below may differ slightly.
-
-> **Before you start: GitHub repositories used for free hosting are public.** This project contains only the public dataset's
-> model, made-up sample clients and code, so that is fine. **Never upload real or confidential EPF data to it.**
-
-### Step 1: Create a GitHub account
-1. Go to <https://github.com> and click **Sign up**.
-2. Follow the steps (email, password, a username, email verification). Remember your username.
-
-### Step 2: Create a repository (a folder on GitHub)
-1. After signing in, click the **+** at the top right and choose **New repository**.
-2. **Repository name:** `credit-default-app` (any name without spaces).
-3. Choose **Public**.
-4. Leave "Add a README file" **unticked** (this folder already has one).
-5. Click **Create repository**.
-
-### Step 3: Upload the files
-1. **Unzip** the zip file on your computer first. You will get a folder called `credit_default_app`.
-2. On your new empty repository page, click the link **uploading an existing file**.
-3. Open the `credit_default_app` folder on your computer and **select everything inside it** (not the folder itself), then
-   drag it into the GitHub page. Folders such as `sample_data` upload with their files.
-4. **Important:** `app.py` must end up at the top level of the repository, not inside an extra folder.
-5. Wait until all files show as uploaded, then click the green **Commit changes** button at the bottom.
-6. **Check the hidden folder.** On GitHub, look for a folder named `.streamlit`. If it is missing (some computers hide folders
-   that start with a dot):
-   1. Click **Add file → Create new file**.
-   2. In the name box type exactly `.streamlit/config.toml` (typing the `/` creates the folder).
-   3. Open `.streamlit/config.toml` from the unzipped folder in a text editor, copy everything and paste it into GitHub.
-   4. Click **Commit changes**.
-   The app still works without this file, because `ui.py` also sets the colours, but the theme will use Streamlit defaults.
-7. Also check that `packages.txt` is in the repository. It contains one line, `default-jre-headless`, and it is what installs Java.
-
-### Step 4: Deploy on Streamlit Community Cloud
-1. Go to <https://share.streamlit.io> and click **Continue with GitHub** (or **Sign in**). Allow Streamlit to access your GitHub.
-2. Click **Create app** (or **New app**), then choose **Deploy a public app from GitHub**.
-3. Fill in:
-   * **Repository:** `your-username/credit-default-app`
-   * **Branch:** `main`
-   * **Main file path:** `app.py`
-   * **App URL:** pick a short name (optional)
-4. Open **Advanced settings** and choose **Python 3.12** if the option is there (3.11 also works).
-5. Click **Deploy**.
-6. The first start takes **2 to 5 minutes**, because it installs Java and the packages. You can watch progress in the log on the
-   right ("Manage app" at the bottom right opens it later).
-7. When the app appears, **copy the web address** (it ends in `.streamlit.app`) and share it.
-
-Free apps go to sleep after a period with no visitors. The next visitor sees a "Wake up" button and the app starts again in a
-minute. **Open it a few minutes before a presentation** so it is awake.
-
-### Step 5: Changing something later
-* **To edit a file:** open it on GitHub, click the pencil icon, edit, then **Commit changes**. The app updates by itself in
-  about a minute.
-* **To replace a file** (for example a new PMML): on the repository page click **Add file → Upload files**, drag the new file
-  with the **same name**, and commit.
-* **To restart the app:** on share.streamlit.io, open the app's menu (three dots) and choose **Reboot**.
-
----
-
-## 4. Run it on your own computer (optional)
-
-1. Install **Python 3.10 or newer** from <https://www.python.org> and a **Java runtime (version 8 or newer)**, for example
-   from <https://adoptium.net>. Check Java with `java -version` in a terminal.
-2. Open a terminal **inside this folder** and run:
-   ```
-   pip install -r requirements.txt
-   streamlit run app.py
-   ```
-3. Your browser opens at `http://localhost:8501`. Press `Ctrl + C` in the terminal to stop.
-
----
-
-## 5. Suggested 5-minute walkthrough for your presentation
-
-1. **Predict tab.** Load the low-risk and high-risk examples in turn, selecting **Calculate risk** after each.
-   Load the **borderline example**, select **Calculate risk**, and change **Decision cutoff** below the client form to show how the
-   decision flips. Point out the "what if" chart: the chart varies only the latest repayment status.
-2. **Score a CSV tab.** Upload a synthetic demonstration CSV with outcomes, show the risk distribution, the flagged clients, and download the
-   results. Scroll to the confusion matrix and ROC curve, and say that the outcomes in this file are synthetic.
-3. **Model performance tab.** This is the honest evidence: 5-fold cross-validated **ROC AUC 0.780**, **recall 54.8%** and
-   **precision 53.3%** at the 0.30 cutoff. Show how SMOTE and the single split compared.
-4. **About tab.** Explain the 16 inputs, the dropped columns and the limits.
-
----
-
-## 6. Using a different model later
+## 3. Using a different model later
 
 1. In KNIME, retrain and export the model with **Gradient Boosted Trees to PMML** and the **PMML Writer**. Replace
    `credit_card_default_classifier.pmml` (same name).
@@ -163,37 +75,10 @@ minute. **Open it a few minutes before a presentation** so it is awake.
 3. Update the results in `model_meta.json` and the cutoff, and re-run `python generate_synthetic_data.py` if you want new sample
    files (it needs Java).
 
-**Formulas used by `credit_features.py` (identical to the KNIME workflow):**
-```
-avg_bill    = (BILL_AMT1 + ... + BILL_AMT6) / 6
-total_paid  = PAY_AMT1 + ... + PAY_AMT6
-max_delay   = maximum of PAY_0, PAY_2 ... PAY_6
-utilisation = BILL_AMT1 / LIMIT_BAL
-pay_ratio   = total_paid / (bill total, or 1 if the bill total is 0)
-n_late      = number of PAY_ columns greater than 0
-EDUCATION   = codes 0, 5, 6 recoded to 4, then one-hot into EDUCATION_1 ... EDUCATION_4
-```
 
 ---
 
-## 7. Troubleshooting
-
-| Problem | What to do |
-| --- | --- |
-| "The model could not be loaded" or a Java error | Java is missing. On Streamlit Community Cloud check that `packages.txt` is in the repository and reboot the app. On your computer install Java 8 or newer. |
-| `ModuleNotFoundError` in the log | A package is missing from `requirements.txt`. Add its name on a new line, commit, and the app rebuilds. |
-| "File does not exist: app.py" when deploying | The files were uploaded inside an extra folder. Move them to the top level of the repository, or set **Main file path** to `folder_name/app.py`. |
-| The app shows "Oh no" or a red error box | Open **Manage app** (bottom right) and read the log. The last lines say what failed. |
-| Theme colours look different | `.streamlit/config.toml` is missing. See step 3.6. |
-| "The file is missing these columns" after uploading | Check the column names against section 2. Names are case-sensitive. |
-| Rows were "left out" with a warning | Those rows had empty or non-numeric values, or a zero credit limit. Fix them in the CSV. |
-| The app is slow on first open | The free app was asleep. Wait a minute. |
-| A very large CSV fails | Free hosting has limited memory. Try fewer than about 50,000 rows. |
-| GitHub says a file is too large | The browser upload limit is 25 MB per file. All files here are far below it. |
-
----
-
-## 8. Good to know
+## 4. Good to know
 
 * **Cutoff 0.30.** A client is flagged when the probability is at or above the cutoff. A lower cutoff catches more defaulters
   and raises more false alarms.
@@ -205,10 +90,3 @@ EDUCATION   = codes 0, 5, 6 recoded to 4, then one-hot into EDUCATION_1 ... EDUC
   summary columns, except the latest repayment status (`PAY_0`), which carries information the summaries do not.
 
 
-### Current model update
-
-The PMML includes three one-hot marital-status inputs and was retrained on the full dataset.
-The default cutoff is 0.30. The final-model performance tab reports the supplied marriage-model
-cross-validation results (AUC 0.779996549; F1 about 0.540336 at 0.30), not training-set scores.
-The old reference ROC curve is not shown as a curve for this model. Synthetic examples are regenerated
-with marital status and outcomes sampled from the current model.
