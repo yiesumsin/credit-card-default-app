@@ -55,7 +55,7 @@ Python environment. Use the launcher above rather than a bare `streamlit run app
   download button. If the file has a `default` column (1 = defaulted, 0 = did not), you also get the confusion matrix and
   the ROC curve.
 * **Model performance:** the KNIME cross-validation results (ROC AUC, recall, precision, F1, confusion matrix, ROC curve).
-* **About:** how the model and inputs work, and the limits.
+* **About:** how the model and inputs work.
 
 ### Format of a CSV you upload
 One row per client, with these columns (any order; extra columns such as `ID` are kept):
