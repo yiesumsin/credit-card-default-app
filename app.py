@@ -401,7 +401,7 @@ Sex is not used. The monthly bill, payment and status columns, apart from the la
 summary inputs above, which carry the same information with less redundancy.
 
 #### Limitations
-- The data comes from Taiwan in 2005. This is a proof of concept, not EPF data, and not suitable for credit decisions.
+- The data comes from UCI dataset repository based off Credit Card Default Clients from Taiwan in 2005. This is a proof of concept, not suitable for credit decisions.
 - A cross-validated ROC AUC of about 0.78 means the model ranks risk usefully but imperfectly. At the 0.30 cutoff,
   roughly half of the flagged clients do not default.
 - Probabilities are only meaningful for clients similar to the training population.
